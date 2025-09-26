@@ -10,7 +10,7 @@ class AbstractOrderRepository(ABC):
         pass
     
     @abstractmethod
-    def paid(self, order: Order, user: User, product: Product):
+    def paid(self, order: Order,):
         pass
 
     @abstractmethod
@@ -62,11 +62,11 @@ class OrderRepository(AbstractOrderRepository):
         conn.close()
 
     # 支付订单
-    def paid(self, order: Order, user: User, product: Product):
-        if product.stock < order.quantity:
+    def paid(self, order: Order):
+        if order.product.stock < order.quantity:
             print("仓库库存不足！")
             return
-        if user.balance < product.price * order.quantity:
+        if order.user.balance < order.product.price * order.quantity:
             print("用户余额不足！")
             return
         

@@ -8,8 +8,8 @@ def create_order(user: User, product: Product, quantity: int, repository: OrderR
     return order
 
 
-def pay_order(order: Order, user: User, product: Product, repository: OrderRepository):
-    repository.paid(order, user, product)
+def pay_order(order: Order, repository: OrderRepository):
+    repository.paid(order)
     print("支付成功！")
     return order
 
