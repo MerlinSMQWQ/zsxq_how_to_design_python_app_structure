@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import sqlite3
-from models import Order
+from models import Order, User, Product, OrderStatus
 
 
 class AbstractOrderRepository(ABC):
@@ -10,7 +10,7 @@ class AbstractOrderRepository(ABC):
         pass
     
     @abstractmethod
-    def cancle(self, order: Order):
+    def pay(self, order: Order, user: User, product: Product):
         pass
 
 class OrderRepository(AbstractOrderRepository):
@@ -52,6 +52,26 @@ class OrderRepository(AbstractOrderRepository):
             order.status.name,
             order.created_time
         ))
+
+        conn.commit()
+        conn.close()
+
+    # 支付订单
+    def pay(self, order: Order, user: User, product: Product):
+        if product.stock - order.quantity < 0:
+            print("仓库库存不足！")
+            return
+        if user.balance < product.price * order.quantity:
+            print("用户余额不足！")
+            return
+
+        order.status = OrderStatus.PAID
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        cursor.execute('''
+            UPDATE orders SET status = ? WHERE order_id = ?
+        ''', (OrderStatus.PAID.name, order.order_id))
 
         conn.commit()
         conn.close()
