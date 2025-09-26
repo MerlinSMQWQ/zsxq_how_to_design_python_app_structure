@@ -10,7 +10,7 @@ class AbstractOrderRepository(ABC):
         pass
     
     @abstractmethod
-    def pay(self, order: Order, user: User, product: Product):
+    def paid(self, order: Order, user: User, product: Product):
         pass
 
 class OrderRepository(AbstractOrderRepository):
@@ -58,7 +58,7 @@ class OrderRepository(AbstractOrderRepository):
         conn.close()
 
     # 支付订单
-    def pay(self, order: Order, user: User, product: Product):
+    def paid(self, order: Order, user: User, product: Product):
         if product.stock < order.quantity:
             print("仓库库存不足！")
             return
@@ -66,10 +66,7 @@ class OrderRepository(AbstractOrderRepository):
             print("用户余额不足！")
             return
         
-        # 扣减库存和余额
-        product.stock -= order.quantity
-        user.balance -= product.price * order.quantity
-        order.status = OrderStatus.PAID
+        order.pay()
         
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
