@@ -42,6 +42,5 @@ class Order:
 
     def cancel(self):
         self.product.stock += self.quantity
-        if self.status == OrderStatus.PAID:
-            self.user.balance += self.total
+        self.user.balance += self.total
         self.status = OrderStatus.CANCELLED

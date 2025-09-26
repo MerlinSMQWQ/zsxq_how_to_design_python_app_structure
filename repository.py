@@ -13,6 +13,10 @@ class AbstractOrderRepository(ABC):
     def paid(self, order: Order, user: User, product: Product):
         pass
 
+    @abstractmethod
+    def canceled(self, order: Order):
+        pass
+
 class OrderRepository(AbstractOrderRepository):
     """订单仓库 - 负责订单的数据访问"""
 
@@ -77,3 +81,9 @@ class OrderRepository(AbstractOrderRepository):
 
         conn.commit()
         conn.close()
+
+    def canceled(self, order: Order):
+        if order.status == OrderStatus.UNPAID:
+            order.status = OrderStatus.CANCELLED
+        elif order.status == OrderStatus.PAID:
+            order.cancel()

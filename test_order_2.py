@@ -1,5 +1,5 @@
 from models import Product, User, OrderStatus, Order
-from service import create_order, pay_order
+from service import create_order, pay_order, cancel_order
 from repository import OrderRepository
 
 def test_creat_order():
@@ -11,6 +11,7 @@ def test_creat_order():
     order = create_order(user=user, product=product, quantity=5, repository=OrderRepository())
 
     assert order.status == OrderStatus.UNPAID
+    return order
 
 def test_order_with_available_stock():
     # 我们创建一个商品 product001，它的库存是 10，价格是 20
@@ -22,3 +23,20 @@ def test_order_with_available_stock():
     assert order.status == OrderStatus.PAID
     assert user.balance == 0
     assert product.stock == 5
+    return order
+
+def test_cancel_order_1():
+    order = test_order_with_available_stock()
+    order = cancel_order(order, OrderRepository())
+    assert order.status == OrderStatus.CANCELLED
+    assert order.user.balance == 100
+    assert order.product.stock == 10
+
+def test_cancel_order_2():
+    order = test_order_with_available_stock()
+    order = cancel_order(order, OrderRepository())
+    assert cancel_order(order, OrderRepository()) == order
+    assert order.status == OrderStatus.CANCELLED
+    assert order.user.balance == 100
+    assert order.product.stock == 10
+    
