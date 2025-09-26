@@ -37,6 +37,7 @@ class OrderRepository(AbstractOrderRepository):
         conn.close()
 
     def add(self, order: Order):
+        self._init_table()
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 
@@ -50,7 +51,7 @@ class OrderRepository(AbstractOrderRepository):
             order.product.product_id,
             order.quantity,
             order.status.name,
-            order.created_time
+            order.created_time.isoformat()  # 按照规范使用 isoformat()
         ))
 
         conn.commit()
@@ -58,14 +59,18 @@ class OrderRepository(AbstractOrderRepository):
 
     # 支付订单
     def pay(self, order: Order, user: User, product: Product):
-        if product.stock - order.quantity < 0:
+        if product.stock < order.quantity:
             print("仓库库存不足！")
             return
         if user.balance < product.price * order.quantity:
             print("用户余额不足！")
             return
-
+        
+        # 扣减库存和余额
+        product.stock -= order.quantity
+        user.balance -= product.price * order.quantity
         order.status = OrderStatus.PAID
+        
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
 

@@ -20,3 +20,5 @@ def test_order_with_available_stock():
     order = Order(order_id = 'order-001', user = user, product = product, quantity = 5)
     pay_order(order, user, product, OrderRepository())
     assert order.status == OrderStatus.PAID
+    assert user.balance == 0
+    assert product.stock == 5

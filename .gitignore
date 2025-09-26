@@ -9,5 +9,5 @@ wheels/
 # Virtual environments
 .venv
 
-# order.db
-order.db
+# orders.db
+orders.db

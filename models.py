@@ -28,14 +28,15 @@ class Order:
         self.quantity = quantity
         self.created_time = datetime.now()
         self.status = OrderStatus.UNPAID
-        # 处理商品库存
-        self.product.stock -= self.quantity
+        # 不应该在这里处理商品库存，而应该在支付时处理
 
     def pay(self):
         # 计算一下价格
         self.total = self.product.price * self.quantity
         # 扣除用户余额
         self.user.balance -= self.total
+        # 扣除商品库存
+        self.product.stock -= self.quantity
         # 修改订单状态
         self.status = OrderStatus.PAID
 
